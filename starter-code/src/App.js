@@ -5,12 +5,14 @@ import foods from './foods.json';
 import Foodbox from './components/FoodBox';
 import shortid from 'shortid';
 import AddFood from './components/AddFood';
+import Search from './components/Search';
 
 
 class App extends Component {
 
   state = {
     foods: foods,
+    foodsFiltered: foods,
     showForm: false
   }
 
@@ -29,6 +31,21 @@ class App extends Component {
     this.state.showForm = false;
   }
 
+  filterFoods = searchTerm => {
+    console.log('search term', searchTerm);
+
+    // apply lower case to the search term
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    
+    const filteredFoods = this.state.foods.filter( food => {
+      // apply lower case to the food name
+      const foodName = food.name.toLowerCase();
+      // filter only the foods that include the search term in their name
+      return foodName.includes(lowerSearchTerm);
+    })
+    this.setState({ foodsFiltered: filteredFoods })
+  }
+
   render() {
     return (
       <div className="App">
@@ -41,6 +58,8 @@ class App extends Component {
         Add Food
         </button>
 
+        <Search filterByTerm={this.filterFoods} />
+
         {
           this.state.showForm ? 
             <AddFood addOneFood={this.addFood} />
@@ -49,7 +68,7 @@ class App extends Component {
         }
         
         {
-          this.state.foods.map( (food) => {
+          this.state.foodsFiltered.map( (food) => {
             return <Foodbox 
               key={shortid.generate()}  
               {...food}  
